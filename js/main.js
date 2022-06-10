@@ -1,68 +1,66 @@
-function playGame() {
-    let choice = confirm("Would you like to play rock-paper-scissors?")
-    if (choice) {
-        let playerChoice = prompt("Choose: rock, paper, scissors");
-        
-        if (playerChoice) {
-            let playerOne = playerChoice.trim().toLowerCase();
-            if (playerOne === "rock" || playerOne === "paper" || playerOne === "scissors") {
+const selectionButtons = document.querySelectorAll('[data-selection]');
+const finalColumn = document.querySelector('[data-final-column]');
+const computerScoreSpan = document.querySelector('[data-computer-score]')
+const yourScoreSpan = document.querySelector('[data-your-score]')
+const SELECTIONS = [
+    {
+        name: "paper",
+        emoji: "✋",
+        beats: 'rock'
+    },
+    {
+        name: "rock",
+        emoji: "✊",
+        beats: 'scissors'
+    },
+    {
+        name: "scissors",
+        emoji: "✌️",
+        beats: 'paper'
+    },
+]
 
-                let computerChoice = Math.floor(Math.random() * 3 + 1); // not from 0 to 2, but from 0 to 3!
-                let computer = computerChoice === 1 ? "rock" : computerChoice === 2 ? "paper" : "scissors";
-                
-                let result =
-                    playerOne === computer ? "Tie game!":
-                    playerOne === "rock" && computer === "paper" ? 
-                    `playerOne: ${playerOne}\nComputer: ${computer}\nComputer wins!`:
-                    playerOne === "paper" && computer === "scissors" ? 
-                    `playerOne: ${playerOne}\nComputer: ${computer}\nComputer wins!`:
-                    playerOne === "scissors" && computer === "rock" ? 
-                    `playerOne: ${playerOne}\nComputer: ${computer}\nComputer wins!`:
-                    `playerOne: ${playerOne}\nComputer: ${computer}\nplayerOne wins!`;
-                console.log(result);
-                let playAgain = confirm("Play Again?");
-                playAgain ? location.reload() : console.log("Sure! See ya next time :)")
+selectionButtons.forEach(selectionButton => {
+    selectionButton.addEventListener('click', e => {
+        const selectionName = selectionButton.dataset.selection
+        const selection = SELECTIONS.find(selection => selection.name === selectionName);
+        makeSelection(selection);
+    })
+});
 
-            } else {
-                console.log("Please, choose: rock, paper, scissors");
-            }
-        } else {
-            console.log("I guess you changed your mind. Maybe next time.")
-        }
-    } else {
-        console.log("Next time!")
-    }
+function addSelectionResult(selection, winner) {
+    const div = document.createElement('div');
+    div.innerText = selection.emoji
+    div.classList.add('result-selection')
+    if (winner) div.classList.add('winner');
+    finalColumn.after(div)
 }
 
-playGame()
+function makeSelection(selection) {
+    const computerSelection = randomSelection();
+    const yourWinner = isWinner(selection, computerSelection);
+    const computerWinner = isWinner(computerSelection, selection);
+    console.log(computerSelection);
 
+    addSelectionResult(computerSelection, computerWinner);
+    addSelectionResult(selection, yourWinner);
 
+    if (yourWinner) incrementScore(yourScoreSpan);
+    if (computerWinner) incrementScore(computerScoreSpan);
+}
 
-/* function computerPlay() {
-    list = ["Rock", "Paper", "Scissors"];
-    randomString = String(Math.floor(Math.random()*list.length));
-    return list[randomString];
-} */
+function incrementScore(scoreSpan) {
+    scoreSpan.innerText = parseInt(scoreSpan.innerText) + 1
+}
 
-/* let rockPaperScissors = function game(playerSelection="Rock", computerSelection="Rock") {
+function isWinner(selection, opponentSelection) {
+    return selection.beats === opponentSelection.name;
+}
 
-    if (playerSelection === computerSelection) {
-        return "It's a draw!"
-
-    } else if (playerSelection === "Rock" && computerSelection === "Paper") {
-        return console.log("Computer wins! Paper beats Rock");
-
-    } else if (playerSelection === "Paper" && computerSelection === "Scissors") {
-        return console.log("Computer wins! Scissors beat Paper");
-
-    } else if (playerSelection === "Scissors" && computerSelection === "Rock") {
-        return console.log("Computer wins! Rock beats Scissors");
-
-    } else {
-        return console.log("You win!");
-    }   
-} */
-
+function randomSelection() {
+    const randomIndex = Math.floor(Math.random() * SELECTIONS.length);
+    return SELECTIONS[randomIndex];
+}
 
 
 
